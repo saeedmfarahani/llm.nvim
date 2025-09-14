@@ -227,15 +227,16 @@ function M.setup()
 
   local root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]) or vim.fn.getcwd()
 
-  local client = vim.lsp.start({
+  vim.lsp.start({
     name = "llm-ls",
     cmd = cmd,
     cmd_env = config.get().lsp.cmd_env,
     root_dir = root_dir,
     on_init = M.lsp_init,
-    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
-      offsetEncoding = { "utf-16" },
-    }),
+    offset_encoding = "utf-16",
+    capabilities = {
+      offsetEncoding = { "utf-16", "utf-8" },
+    },
     on_error = function()
       vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
     end,
