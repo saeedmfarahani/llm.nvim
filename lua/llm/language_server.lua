@@ -209,7 +209,7 @@ function M.setup()
     root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]),
   })
 
-  if client_id == nil then
+  if not client_id then
     vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
   else
     local augroup = "llm.language_server"
