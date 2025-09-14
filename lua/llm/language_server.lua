@@ -114,10 +114,9 @@ function M.get_completions(callback)
     return
   end
 
-  local function mpp(options)
-    return lsp.util.make_position_params(options.window, options.position_encoding)
-  end
-  local params = mpp({ position_encoding = "utf-16" })
+  local params = {}
+  table.insert(params, lsp.util.make_position_params(nil, "utf-16"))
+
   params.model = utils.get_model()
   params.backend = config.get().backend
   params.url = utils.get_url()
