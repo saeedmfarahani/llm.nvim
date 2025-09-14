@@ -168,7 +168,7 @@ function M.reject_completion(completion_result)
   params.shownCompletions = { 0 }
   local client = lsp.get_client_by_id(M.client_id)
   if client ~= nil then
-    local status, _ = client.request("llm-ls/rejectCompletion", params, function() end, 0)
+    local status, _ = client:request("llm-ls/rejectCompletion", params, function() end, 0)
 
     if not status then
       vim.notify("[LLM] request 'llm-ls/rejectCompletions' failed", vim.log.levels.WARN)
@@ -207,7 +207,6 @@ function M.setup()
     cmd = cmd,
     cmd_env = config.get().lsp.cmd_env,
     root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]),
-    offset_encoding = "utf-16",
   })
 
   if client_id == nil then
