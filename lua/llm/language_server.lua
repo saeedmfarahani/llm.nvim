@@ -202,11 +202,12 @@ function M.setup()
     cmd = { bin_path }
   end
 
-  local client_id = lsp.start({
+  local client_id = lsp.start_client({
     name = "llm-ls",
     cmd = cmd,
     cmd_env = config.get().lsp.cmd_env,
     root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]),
+    offset_encoding = "utf-16",
   })
 
   if not client_id then
