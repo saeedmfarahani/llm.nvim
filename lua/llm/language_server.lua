@@ -232,8 +232,10 @@ function M.setup()
     cmd = cmd,
     cmd_env = config.get().lsp.cmd_env,
     root_dir = root_dir,
-    offset_encoding = "utf-16",
     on_init = M.lsp_init,
+    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
+      offsetEncoding = { "utf-16" },
+    }),
     on_error = function()
       vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
     end,
