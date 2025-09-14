@@ -176,6 +176,29 @@ function M.reject_completion(completion_result)
   end
 end
 
+function M.lsp_init(client)
+  local augroup = api.nvim_create_augroup("llm.language_server", { clear = true })
+
+  api.nvim_create_autocmd("BufEnter", {
+    group = augroup,
+    pattern = config.get().enable_suggestions_on_files,
+    callback = function(ev)
+      if not vim.lsp.buf_is_attached(ev.buf, client.id) then
+        vim.lsp.buf_attach_client(ev.buf, client.id)
+      end
+    end,
+  })
+
+  api.nvim_create_autocmd("VimLeavePre", {
+    group = augroup,
+    callback = function()
+      vim.lsp.stop_client(client.id)
+    end,
+  })
+
+  M.client_id = client.id
+end
+
 function M.setup()
   if M.setup_done then
     return
@@ -210,32 +233,11 @@ function M.setup()
     cmd_env = config.get().lsp.cmd_env,
     root_dir = root_dir,
     offset_encoding = "utf-16",
+    on_init = M.lsp_init,
+    on_error = function()
+      vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
+    end,
   })
-
-  if not client then
-    vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
-  else
-    local augroup = api.nvim_create_augroup("llm.language_server", { clear = true })
-
-    api.nvim_create_autocmd("BufEnter", {
-      group = augroup,
-      pattern = config.get().enable_suggestions_on_files,
-      callback = function(ev)
-        if not vim.lsp.buf_is_attached(ev.buf, client.id) then
-          vim.lsp.buf_attach_client(ev.buf, client.id)
-        end
-      end,
-    })
-
-    api.nvim_create_autocmd("VimLeavePre", {
-      group = augroup,
-      callback = function()
-        vim.lsp.stop_client(client.id)
-      end,
-    })
-
-    M.client_id = client.id
-  end
 
   M.setup_done = true
 end
