@@ -239,6 +239,7 @@ function M.setup()
     offset_encoding = "utf-16",
     capabilities = {
       offsetEncoding = "utf-16",
+      position_encoding = "utf-16",
     },
     on_error = function()
       vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
