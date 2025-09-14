@@ -202,41 +202,41 @@ function M.setup()
     cmd = { bin_path }
   end
 
-  local client_id = lsp.start_client({
+  local root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]) or vim.fn.getcwd()
+
+  local client = vim.lsp.start({
     name = "llm-ls",
     cmd = cmd,
     cmd_env = config.get().lsp.cmd_env,
-    root_dir = vim.fs.dirname(vim.fs.find({ ".git" }, { upward = true })[1]),
+    root_dir = root_dir,
     offset_encoding = "utf-16",
   })
 
-  if not client_id then
+  if not client then
     vim.notify("[LLM] Error starting llm-ls", vim.log.levels.ERROR)
   else
-    local augroup = "llm.language_server"
-
-    api.nvim_create_augroup(augroup, { clear = true })
+    local augroup = api.nvim_create_augroup("llm.language_server", { clear = true })
 
     api.nvim_create_autocmd("BufEnter", {
       group = augroup,
       pattern = config.get().enable_suggestions_on_files,
       callback = function(ev)
-        if not lsp.buf_is_attached(ev.buf, client_id) then
-          lsp.buf_attach_client(ev.buf, client_id)
+        if not vim.lsp.buf_is_attached(ev.buf, client.id) then
+          vim.lsp.buf_attach_client(ev.buf, client.id)
         end
       end,
     })
-    M.client_id = client_id
 
     api.nvim_create_autocmd("VimLeavePre", {
       group = augroup,
       callback = function()
-        lsp.stop_client(client_id)
+        vim.lsp.stop_client(client.id)
       end,
     })
+
+    M.client_id = client.id
   end
 
   M.setup_done = true
 end
-
 return M
